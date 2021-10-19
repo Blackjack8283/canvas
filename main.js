@@ -2,6 +2,7 @@ const wrapper = document.getElementById("wrapper");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+//書いている時のマウスの位置情報を記録
 let p_vec = [];
 
 let hold = false;
@@ -9,8 +10,11 @@ canvas.addEventListener("pointerdown", (e)=>{
     const x = e.clientX - canvas.offsetLeft;
     const y = e.clientY - canvas.offsetTop;
     hold = true;
-    //p_vecにクリックの位置ベクトルを前から追加
-    p_vec.unshift([]);
+    //マウスの位置ベクトルを入れる空配列を
+    //より未来の履歴が入っている配列を消してから先頭に追加
+    p_vec.splice(0,cur, []);
+    cur = 0;
+    //空配列ににクリックの位置ベクトルを前から追加
     p_vec[0].unshift( new Vector2(x,y) );
     dot(p_vec[0][0]);
 });
@@ -19,17 +23,30 @@ canvas.addEventListener("pointermove", (e)=>{
     if(!hold) return;
     const x = e.clientX - canvas.offsetLeft;
     const y = e.clientY - canvas.offsetTop;
-    //移動後のマウスの位置ベクトルを前から追加
+    //マウスの位置ベクトルを前から追加
     p_vec[0].unshift( new Vector2(x,y) );
     line(p_vec[0][1], p_vec[0][0]);
 });
 
 canvas.addEventListener("pointerup", (e)=>{
     hold = false;
-    console.log(p_vec);
 });
 
-const r = 10;
+let cur = 0;
+window.addEventListener("keydown", (e)=>{
+    const key = e.key;
+    if(key == "r"){
+        repaint();
+    } else if(key == "z"){
+        if(cur < p_vec.length) cur++;
+        repaint();
+    } else if(key == "x"){
+        if(cur > 0) cur--;
+        repaint();
+    }
+});
+
+const r = 8;
 ctx.fillStyle = "black";
 ctx.strokeStyle = "black";
 onResize();
@@ -64,9 +81,25 @@ function dot(v){ // v -> vector2
     ctx.fill();
 }
 
+function repaint(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const len = p_vec.length;
+    for(let i = len-1; i >= cur; i--){
+        const dots = p_vec[i].length;
+        if(dots == 1) dot(p_vec[i][dots-1]);
+        else {
+            for(let j = dots-1; j >= 1; j--){
+                line(p_vec[i][j-1], p_vec[i][j]);
+            }
+        }
+    }
+}
+
+
 window.addEventListener("resize", ()=>{ onResize(); });
 
 function onResize(){
     canvas.width = wrapper.offsetWidth;
     canvas.height = wrapper.offsetHeight;
+    repaint();
 }
