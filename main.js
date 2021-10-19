@@ -3,6 +3,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 //書いている時のマウスの位置情報を記録
+//色の情報を対応させる！！
 let p_vec = [];
 
 let hold = false;
@@ -16,6 +17,7 @@ canvas.addEventListener("pointerdown", (e)=>{
     cur = 0;
     //空配列ににクリックの位置ベクトルを前から追加
     p_vec[0].unshift( new Vector2(x,y) );
+    color(pencil_color);
     dot(p_vec[0][0]);
 });
 
@@ -33,22 +35,27 @@ canvas.addEventListener("pointerup", (e)=>{
 });
 
 let cur = 0;
+let pencil_color = 1;
 window.addEventListener("keydown", (e)=>{
-    const key = e.key;
-    if(key == "r"){
-        repaint();
-    } else if(key == "z"){
-        if(cur < p_vec.length) cur++;
-        repaint();
-    } else if(key == "x"){
-        if(cur > 0) cur--;
-        repaint();
+    switch(e.key){
+        case "r":
+            repaint();
+            break;
+        case "z":
+            if(cur < p_vec.length) cur++;
+            repaint();
+            break;
+        case "x":
+            if(cur > 0) cur--;
+            repaint();
+            break;
     }
+    if(e.key.match("[0-9]")) pencil_color = Number(e.key);
+    console.log(pencil_color);
 });
 
 const r = 8;
-ctx.fillStyle = "black";
-ctx.strokeStyle = "black";
+color(1);
 onResize();
 
 function line(a, b){ //a,b -> vector2
@@ -95,6 +102,43 @@ function repaint(){
     }
 }
 
+function color(num){
+    let col;
+    switch(num){
+        case 1:
+            col = "black";
+            break;
+        case 2:
+            col = "red";
+            break;
+        case 3:
+            col = "blue";
+            break;
+        case 4:
+            col = "green";
+            break;
+        case 5:
+            col = "orange";
+            break;
+        case 6:
+            col = "purple";
+            break;
+        case 7:
+            col = "aqua";
+            break;
+        case 8:
+            col = "gray";
+            break;
+        case 9:
+            col = "maroon";
+            break;
+        case 0:
+            col = "teal";
+            break;
+    }
+    ctx.fillStyle = col;
+    ctx.strokeStyle = col;
+}
 
 window.addEventListener("resize", ()=>{ onResize(); });
 
