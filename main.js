@@ -5,6 +5,7 @@ const ctx = canvas.getContext("2d");
 //書いている時のマウスの位置情報を記録
 //色の情報を対応させる！！
 let p_vec = [];
+let colors = [];
 
 let hold = false;
 canvas.addEventListener("pointerdown", (e)=>{
@@ -14,6 +15,8 @@ canvas.addEventListener("pointerdown", (e)=>{
     //マウスの位置ベクトルを入れる空配列を
     //より未来の履歴が入っている配列を消してから先頭に追加
     p_vec.splice(0,cur, []);
+    //色情報追加
+    colors.splice(0,cur, pencil_color);
     cur = 0;
     //空配列ににクリックの位置ベクトルを前から追加
     p_vec[0].unshift( new Vector2(x,y) );
@@ -51,7 +54,6 @@ window.addEventListener("keydown", (e)=>{
             break;
     }
     if(e.key.match("[0-9]")) pencil_color = Number(e.key);
-    console.log(pencil_color);
 });
 
 const r = 8;
@@ -92,6 +94,7 @@ function repaint(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const len = p_vec.length;
     for(let i = len-1; i >= cur; i--){
+        color(colors[i]);
         const dots = p_vec[i].length;
         if(dots == 1) dot(p_vec[i][dots-1]);
         else {
